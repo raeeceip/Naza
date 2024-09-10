@@ -1,5 +1,6 @@
 import * as React from "react";
 import { View } from "react-native";
+import IgboTranslation from '~/components/IgboTranslation';
 import Animated, {
     FadeInUp,
     FadeOutDown,
@@ -123,6 +124,7 @@ export default function Screen() {
                     </Button>
                 </CardFooter>
             </Card>
+            <IgboTranslation />
         </View>
     );
 }
