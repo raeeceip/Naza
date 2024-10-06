@@ -7,9 +7,17 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/componen
 // Replace '<YOUR_API_KEY>' with your actual API key
 const API_KEY = '<YOUR_API_KEY>';
 
+interface IgboWord {
+  id: string;
+  word: string;
+  wordClass: string;
+  definitions: string[];
+  pronunciation?: string;
+  examples?: Array<{ igbo: string; english: string }>;
+}
+
 const IgboTranslation = () => {
-    const [word, setWord] = useState('');
-    const [definition, setDefinition] = useState('');
+    const [wordData, setWordData] = useState<IgboWord | null>(null);
     const [loading, setLoading] = useState(false);
 
     const fetchRandomWord = async () => {
@@ -20,14 +28,18 @@ const IgboTranslation = () => {
         };
 
         try {
-            const response = await fetch('https://igboapi.com/api/v1/words/random', options);
+            const response = await fetch('https://igboapi.com/api/v1/words', options);
             const data = await response.json();
-            setWord(data.word);
-            setDefinition(data.definitions[0].englishDefinitions[0]);
+            if (data && data.length > 0) {
+                // Randomly select a word from the returned array
+                const randomIndex = Math.floor(Math.random() * data.length);
+                setWordData(data[randomIndex]);
+            } else {
+                throw new Error('No words returned from API');
+            }
         } catch (error) {
-            console.error('Error fetching Igbo translation:', error);
-            setWord('Error');
-            setDefinition('Failed to fetch translation');
+            console.error('Error fetching Igbo word:', error);
+            setWordData(null);
         }
         setLoading(false);
     };
@@ -44,11 +56,27 @@ const IgboTranslation = () => {
             <CardContent>
                 {loading ? (
                     <Text className="text-center">Loading...</Text>
-                ) : (
+                ) : wordData ? (
                     <View>
-                        <Text className="text-xl font-bold mb-2">{word}</Text>
-                        <Text className="text-base">{definition}</Text>
+                        <Text className="text-xl font-bold mb-2">{wordData.word}</Text>
+                        <Text className="text-base mb-2">({wordData.wordClass})</Text>
+                        {wordData.pronunciation && (
+                            <Text className="text-sm italic mb-2">Pronunciation: {wordData.pronunciation}</Text>
+                        )}
+                        <Text className="text-base mb-2">Definitions:</Text>
+                        {wordData.definitions.map((def, index) => (
+                            <Text key={index} className="text-base ml-4">• {def}</Text>
+                        ))}
+                        {wordData.examples && wordData.examples.length > 0 && (
+                            <View className="mt-4">
+                                <Text className="text-base font-semibold">Example:</Text>
+                                <Text className="text-base italic">{wordData.examples[0].igbo}</Text>
+                                <Text className="text-base">{wordData.examples[0].english}</Text>
+                            </View>
+                        )}
                     </View>
+                ) : (
+                    <Text className="text-center">Failed to fetch word</Text>
                 )}
             </CardContent>
             <CardFooter>
