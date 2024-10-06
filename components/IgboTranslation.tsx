@@ -19,19 +19,27 @@ interface IgboWord {
 const IgboTranslation = () => {
     const [wordData, setWordData] = useState<IgboWord | null>(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchRandomWord = async () => {
         setLoading(true);
+        setError(null);
         const options = {
             method: 'GET',
             headers: { 'X-API-Key': API_KEY }
         };
 
         try {
-            const response = await fetch('https://igboapi.com/api/v1/words', options);
+            const response = await fetch('https://igboapi.com/api/v1/words?keyword=a&page=1&range=10', options);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
-            if (data && data.length > 0) {
-                // Randomly select a word from the returned array
+            console.log("API Response:", data); // Log the entire response
+
+            if (data && Array.isArray(data) && data.length > 0) {
                 const randomIndex = Math.floor(Math.random() * data.length);
                 setWordData(data[randomIndex]);
             } else {
@@ -39,6 +47,7 @@ const IgboTranslation = () => {
             }
         } catch (error) {
             console.error('Error fetching Igbo word:', error);
+            setError(error instanceof Error ? error.message : String(error));
             setWordData(null);
         }
         setLoading(false);
@@ -56,6 +65,8 @@ const IgboTranslation = () => {
             <CardContent>
                 {loading ? (
                     <Text className="text-center">Loading...</Text>
+                ) : error ? (
+                    <Text className="text-center text-red-500">Error: {error}</Text>
                 ) : wordData ? (
                     <View>
                         <Text className="text-xl font-bold mb-2">{wordData.word}</Text>
@@ -76,7 +87,7 @@ const IgboTranslation = () => {
                         )}
                     </View>
                 ) : (
-                    <Text className="text-center">Failed to fetch word</Text>
+                    <Text className="text-center">No word data available</Text>
                 )}
             </CardContent>
             <CardFooter>
