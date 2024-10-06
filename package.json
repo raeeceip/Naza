@@ -10,6 +10,7 @@
     "ios": "expo start -c --ios",
     "web": "expo start -c --web",
     "test": "jest --watchAll",
+    "start": "expo start",
     "clean": "rm -rf .expo node_modules"
   },
   "jest": {
@@ -33,6 +34,7 @@
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
+    "lucide-react": "^0.447.0",
     "lucide-react-native": "^0.427.0",
     "nativewind": "^4.0.1",
     "react": "18.2.0",
