@@ -2,20 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/components/ui/card';
 
 const IgboTranslation = () => {
-    const [translation, setTranslation] = useState('');
+    const [word, setWord] = useState('');
+    const [definition, setDefinition] = useState('');
     const [loading, setLoading] = useState(false);
 
     const fetchTranslation = async () => {
         setLoading(true);
         try {
-            const response = await fetch('https://igboapi.com/api/v1/words/random');
+            const response = await fetch('https://www.igboapi.com/api/v1/words/random');
             const data = await response.json();
-            setTranslation(`${data.word}: ${data.definitions[0].englishDefinitions[0]}`);
+            setWord(data.word);
+            setDefinition(data.definitions[0].englishDefinitions[0]);
         } catch (error) {
             console.error('Error fetching Igbo translation:', error);
-            setTranslation('Failed to fetch translation');
+            setWord('Error');
+            setDefinition('Failed to fetch translation');
         }
         setLoading(false);
     };
@@ -25,13 +29,26 @@ const IgboTranslation = () => {
     }, []);
 
     return (
-        <View className="mt-4">
-            <Text className="text-lg font-semibold mb-2">Igbo Word of the Day</Text>
-            <Text className="mb-2">{loading ? 'Loading...' : translation}</Text>
-            <Button onPress={fetchTranslation} disabled={loading}>
-                <Text>Get New Word</Text>
-            </Button>
-        </View>
+        <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+                <CardTitle>Igbo Word of the Day</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {loading ? (
+                    <Text className="text-center">Loading...</Text>
+                ) : (
+                    <View>
+                        <Text className="text-xl font-bold mb-2">{word}</Text>
+                        <Text className="text-base">{definition}</Text>
+                    </View>
+                )}
+            </CardContent>
+            <CardFooter>
+                <Button onPress={fetchTranslation} disabled={loading} className="w-full">
+                    <Text className="text-primary-foreground">Get New Word</Text>
+                </Button>
+            </CardFooter>
+        </Card>
     );
 };
 
