@@ -4,15 +4,23 @@ import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '~/components/ui/card';
 
+// Replace '<YOUR_API_KEY>' with your actual API key
+const API_KEY = '<YOUR_API_KEY>';
+
 const IgboTranslation = () => {
     const [word, setWord] = useState('');
     const [definition, setDefinition] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const fetchTranslation = async () => {
+    const fetchRandomWord = async () => {
         setLoading(true);
+        const options = {
+            method: 'GET',
+            headers: { 'X-API-Key': API_KEY }
+        };
+
         try {
-            const response = await fetch('https://www.igboapi.com/api/v1/words/random');
+            const response = await fetch('https://igboapi.com/api/v1/words/random', options);
             const data = await response.json();
             setWord(data.word);
             setDefinition(data.definitions[0].englishDefinitions[0]);
@@ -25,7 +33,7 @@ const IgboTranslation = () => {
     };
 
     useEffect(() => {
-        fetchTranslation();
+        fetchRandomWord();
     }, []);
 
     return (
@@ -44,7 +52,7 @@ const IgboTranslation = () => {
                 )}
             </CardContent>
             <CardFooter>
-                <Button onPress={fetchTranslation} disabled={loading} className="w-full">
+                <Button onPress={fetchRandomWord} disabled={loading} className="w-full">
                     <Text className="text-primary-foreground">Get New Word</Text>
                 </Button>
             </CardFooter>
